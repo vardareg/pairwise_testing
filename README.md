@@ -60,7 +60,7 @@ To ensure all generated tests are logically valid and runnable, we defined 5 con
 4.  **List Inputs**: If `InputType` is `ListOfLists`, `HeadersMode` cannot be `Keys`.
 5.  **Wide Text**: If `Size` is `WideText`, `TableFormat` must be a grid-like format (`grid`, `psql`, `github`) that supports wrapping or distinct layout.
 #### Injected Bugs
-A logic error was introduced in `tabulate.py` at lines 2048-2051 to cause failure under specific conditions involving `ListOfDicts` and `psql` format.
+A logic error was introduced in `src/tabulate/__init__.py` to cause failure under specific conditions involving `ListOfDicts` and `psql` format.
 
 ```python
 # Bug injected for Pairwise Testing Project
@@ -74,18 +74,18 @@ This will cause the function to return an empty string instead of the formatted 
 ### 3. Pairwise Test Generation
 
 *   **Tool Used:** Microsoft PICT (Pairwise Independent Combinatorial Testing)
-*   **Model File:** `tabulate_model.txt`
-*   **Generated Suite:** `pairwise_tests.csv`
+*   **Model File:** `data/tabulate_model.txt`
+*   **Generated Suite:** `data/pairwise_tests.csv`
 *   **Total Tests Generated:** 18
 *   **Constraint Handling:** PICT natively supports constraints, ensuring all 18 tests are valid combinations.
 
 ### 4. Test Implementation
 
-The tests are implemented using `pytest` in `test_tabulate_pairwise.py`.
+The tests are implemented using `pytest` in `tests/test_tabulate_pairwise.py`.
 
 
 
-*   **Data Driven:** The test runner reads `pairwise_tests.csv` and dynamically generates test cases.
+*   **Data Driven:** The test runner reads `data/pairwise_tests.csv` and dynamically generates test cases.
 *   **Fixtures:** A `TestDataFactory` class converts abstract PICT parameters (e.g., "ListOfLists", "Custom") into actual Python objects (data structures, argument lists) required by `tabulate`.
 *   **Oracles (Assertions):**
     1.  **Non-Empty Output:** Asserts that `tabulate()` returns a non-empty string.
@@ -95,7 +95,7 @@ The tests are implemented using `pytest` in `test_tabulate_pairwise.py`.
 
 ### 5. Evaluation Report
 
-To evaluate the effectiveness of the Pairwise approach, we compared it against a Random Baseline suite (`test_random.py`) generated with the same test budget (18 tests).
+To evaluate the effectiveness of the Pairwise approach, we compared it against a Random Baseline suite (`tests/test_random.py`) generated with the same test budget (18 tests).
 
 #### Metrics Comparison
 
@@ -150,23 +150,23 @@ To regenerate the pairwise tests, you need the Microsoft PICT tool.
 #### A. Generating Pairwise Tests
 If you have PICT installed, you can regenerate the test suite:
 ```bash
-pict tabulate_model.txt > pairwise_tests.csv
+pict data/tabulate_model.txt > data/pairwise_tests.csv
 ```
-*Note: `pairwise_tests.csv` is already included in the repo, so this step is optional.*
+*Note: `data/pairwise_tests.csv` is already included in the repo, so this step is optional.*
 
 #### B. Running Pairwise Tests
 ```bash
-python3 -m pytest test_tabulate_pairwise.py
+python3 -m pytest tests/test_tabulate_pairwise.py
 ```
 *Expect failures due to the identified bug.*
 
 #### C. Running Random Baseline
 ```bash
-python3 -m pytest test_random.py
+python3 -m pytest tests/test_random.py
 ```
 *Expect all pass (the test do not force constraits as a fail it added manually to report).*
 
 #### D. Check Coverage
 ```bash
-python3 -m pytest --cov=test_tabulate_pairwise test_tabulate_pairwise.py
+python3 -m pytest --cov=src/tabulate tests/test_tabulate_pairwise.py
 ```

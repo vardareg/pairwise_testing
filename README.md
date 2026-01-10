@@ -48,6 +48,9 @@ We modeled the input space of the `tabulate` function using 7 factors, represent
     *   `Medium5x4`: Standard case.
     *   `WideText`: Includes long strings to test wrapping/layout logic.
 
+#### Exhaustive Calculation: 
+Based on these domains ($3 \times 3 \times 4 \times 3 \times 2 \times 3 \times 3$), the total number of combinatorial possibilities is 1,944.
+
 #### Constraints
 To ensure all generated tests are logically valid and runnable, we defined 5 constraints. Any combination violating these is rejected by the pairwise generator:
 

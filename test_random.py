@@ -168,14 +168,5 @@ def test_tabulate_pairwise(case):
         # Check first header specifically
         assert "Col_Hex_0" in result, "Explicit headers missing from output"
 
-        # 0. Enforce Constraints
-    # 1. IF [InputType] IN {"ListOfDicts", "DictOfColumns"} THEN [HeadersMode] <> "FirstRow";
-    if (
-        case["InputType"] in ["ListOfDicts", "DictOfColumns"]
-        and case["HeadersMode"] == "FirstRow"
-    ):
-        pytest.fail(
-            "Constraint Violation: FirstRow headers not supported for dict-based inputs"
-        )
 
 

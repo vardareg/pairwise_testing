@@ -9,9 +9,10 @@
 ### 1. Context & Goal
 This project applies **Pairwise Testing (2-way combinatorial interaction testing)** to the `tabulate` library, a popular Python tool for pretty-printing tables. The goal is to:
 1.  Model the input space of the `tabulate()` function using Factors and Levels.
-2.  Generate a pairwise covering array using **Microsoft PICT**.
-3.  Implement the tests using `pytest`.
-4.  Evaluate the effectiveness of the Pairwise suite by comparing it against a Random testing baseline with an equivalent budget.
+2. Inject bug to the `tabulate` library.
+3.  Generate a pairwise covering array using **Microsoft PICT**.
+4.  Implement the tests using `pytest`.
+5.  Evaluate the effectiveness of the Pairwise suite by comparing it against a Random testing baseline with an equivalent budget.
 
 ### 2. Test Design Specification
 
@@ -55,6 +56,17 @@ To ensure all generated tests are logically valid and runnable, we defined 5 con
 3.  **NA Handling**: If `MissingValues` is `NA`, `DataMix` must include None (`MixedNone`) to allow verification of replacement.
 4.  **List Inputs**: If `InputType` is `ListOfLists`, `HeadersMode` cannot be `Keys`.
 5.  **Wide Text**: If `Size` is `WideText`, `TableFormat` must be a grid-like format (`grid`, `psql`, `github`) that supports wrapping or distinct layout.
+#### Injected Bugs
+A logic error was introduced in `tabulate.py` at lines 2048-2051 to cause failure under specific conditions involving `ListOfDicts` and `psql` format.
+
+```python
+# Bug injected for Pairwise Testing Project
+# Triggers only when InputType=ListOfDicts AND TableFormat=psql
+if tablefmt == "psql" and isinstance(tabular_data, list) and len(tabular_data) > 0 and isinstance(tabular_data[0], dict):
+    return ""
+```
+
+This will cause the function to return an empty string instead of the formatted table, which should be caught by the test suite assertions.
 
 ### 3. Pairwise Test Generation
 
@@ -67,6 +79,8 @@ To ensure all generated tests are logically valid and runnable, we defined 5 con
 ### 4. Test Implementation
 
 The tests are implemented using `pytest` in `test_tabulate_pairwise.py`.
+
+
 
 *   **Data Driven:** The test runner reads `pairwise_tests.csv` and dynamically generates test cases.
 *   **Fixtures:** A `TestDataFactory` class converts abstract PICT parameters (e.g., "ListOfLists", "Custom") into actual Python objects (data structures, argument lists) required by `tabulate`.
@@ -88,7 +102,7 @@ To evaluate the effectiveness of the Pairwise approach, we compared it against a
 | **Valid Tests** | 18 | 7 |
 | **Invalid Tests (Constraint Violations)** | 0 | 11 |
 | **Bugs Found** | 2 | 0 |
-| **Statement Coverage** | 90% | N/A (Test runner coverage) |
+| **Statement Coverage** | 90% | N/A |
 
 #### Analysis
 
@@ -147,7 +161,7 @@ python3 -m pytest test_tabulate_pairwise.py
 ```bash
 python3 -m pytest test_random.py
 ```
-*Expect all pass (false negatives due to lack of coverage).*
+*Expect all pass (the test do not force constraits as a fail it added manually to report).*
 
 #### D. Check Coverage
 ```bash

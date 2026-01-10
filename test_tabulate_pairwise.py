@@ -109,23 +109,7 @@ def test_tabulate_pairwise(case):
     """
     Executes one row from the PICT output.
     """
-    # 0. Enforce Constraints
-    # 1. IF [InputType] IN {"ListOfDicts", "DictOfColumns"} THEN [HeadersMode] <> "FirstRow";
-    if case['InputType'] in ["ListOfDicts", "DictOfColumns"] and case['HeadersMode'] == "FirstRow":
-        pytest.fail("Constraint Violation: FirstRow headers not supported for dict-based inputs")
 
-    # 2 & 4. IF [HeadersMode] = "Keys" THEN [InputType] IN {"ListOfDicts", "DictOfColumns"};
-    # (Equivalent to IF [InputType] = "ListOfLists" THEN [HeadersMode] <> "Keys")
-    if case['InputType'] == "ListOfLists" and case['HeadersMode'] == "Keys":
-        pytest.fail("Constraint Violation: Keys headers not supported for ListOfLists")
-
-    # 3. IF [MissingValues] = "NA" THEN [DataMix] = "MixedNone";
-    if case['MissingValues'] == "NA" and case['DataMix'] != "MixedNone":
-        pytest.fail("Constraint Violation: MissingValues='NA' requires DataMix='MixedNone'")
-
-    # 5. IF [Size] = "WideText" THEN [TableFormat] IN {"grid", "psql", "github"};
-    if case['Size'] == "WideText" and case['TableFormat'] not in ["grid", "psql", "github"]:
-        pytest.fail("Constraint Violation: WideText requires grid/psql/github format")
 
     # 1. Prepare Inputs
     raw_data = TestDataFactory.generate_data(
@@ -184,3 +168,21 @@ def test_tabulate_pairwise(case):
     if case['HeadersMode'] == "Explicit":
         # Check first header specifically
         assert "Col_Hex_0" in result, "Explicit headers missing from output"
+
+    # 0. Enforce Constraints
+    # 1. IF [InputType] IN {"ListOfDicts", "DictOfColumns"} THEN [HeadersMode] <> "FirstRow";
+    if case['InputType'] in ["ListOfDicts", "DictOfColumns"] and case['HeadersMode'] == "FirstRow":
+        pytest.fail("Constraint Violation: FirstRow headers not supported for dict-based inputs")
+
+    # 2 & 4. IF [HeadersMode] = "Keys" THEN [InputType] IN {"ListOfDicts", "DictOfColumns"};
+    # (Equivalent to IF [InputType] = "ListOfLists" THEN [HeadersMode] <> "Keys")
+    if case['InputType'] == "ListOfLists" and case['HeadersMode'] == "Keys":
+        pytest.fail("Constraint Violation: Keys headers not supported for ListOfLists")
+
+    # 3. IF [MissingValues] = "NA" THEN [DataMix] = "MixedNone";
+    if case['MissingValues'] == "NA" and case['DataMix'] != "MixedNone":
+        pytest.fail("Constraint Violation: MissingValues='NA' requires DataMix='MixedNone'")
+
+    # 5. IF [Size] = "WideText" THEN [TableFormat] IN {"grid", "psql", "github"};
+    if case['Size'] == "WideText" and case['TableFormat'] not in ["grid", "psql", "github"]:
+        pytest.fail("Constraint Violation: WideText requires grid/psql/github format")

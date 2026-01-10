@@ -1349,6 +1349,8 @@ def _normalize_tabular_data(tabular_data, headers, showindex="default"):
     if hasattr(tabular_data, "keys") and hasattr(tabular_data, "values"):
         # dict-like and pandas.DataFrame?
         if hasattr(tabular_data.values, "__call__"):
+            if headers == "firstrow":
+                raise ValueError("HeadersMode 'FirstRow' not supported for DictOfColumns")
             # likely a conventional dict
             keys = tabular_data.keys()
             rows = list(
@@ -1401,10 +1403,7 @@ def _normalize_tabular_data(tabular_data, headers, showindex="default"):
             uniq_keys = set()  # implements hashed lookup
             keys = []  # storage for set
             if headers == "firstrow":
-                firstdict = rows[0] if len(rows) > 0 else {}
-                keys.extend(firstdict.keys())
-                uniq_keys.update(keys)
-                rows = rows[1:]
+                raise ValueError("HeadersMode 'FirstRow' not supported for ListOfDicts")
             for row in rows:
                 for k in row.keys():
                     # Save unique items in input order
@@ -1452,7 +1451,7 @@ def _normalize_tabular_data(tabular_data, headers, showindex="default"):
 
         elif headers == "keys" and len(rows) > 0:
             # keys are column indices
-            headers = list(map(str, range(len(rows[0]))))
+            raise ValueError("HeadersMode 'Keys' not supported for ListOfLists")
 
     # take headers from the first row if necessary
     if headers == "firstrow" and len(rows) > 0:

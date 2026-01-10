@@ -1,0 +1,4 @@
+InputType,HeadersMode,TableFormat,RowIndices,MissingValues,DataMix,Size,ExpectedException
+ListOfDicts,FirstRow,plain,never,Default,Strings,Small2x2,ValueError
+DictOfColumns,FirstRow,plain,never,Default,Strings,Small2x2,ValueError
+ListOfLists,Keys,plain,never,Default,Strings,Small2x2,ValueError

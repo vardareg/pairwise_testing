@@ -93,7 +93,18 @@ The tests are implemented using `pytest` in `tests/test_tabulate_pairwise.py`.
     3.  **Explicit Headers:** If headers are provided explicitly, asserts they appear in the output.
     4.  **Negative Tests:** While the primary suite focuses on valid inputs, the generated set includes combinations that stress-test valid edge cases (e.g., empty values, wide text).
 
-### 5. Evaluation Report
+### 5. Negative Test Suite
+
+To ensure robustness, we implemented a dedicated **Negative Test Suite** (`tests/test_negative.py`) that specifically targets invalid combinations defined in our model. While the Pairwise suite intentionally avoids these combinations, the Negative Suite forces them to verify that the system handles them correctly by raising a `ValueError`.
+
+**Tested Violations:**
+1.  **ListOfDicts + FirstRow:** Verifies that using `FirstRow` headers with a list of dictionaries raises `ValueError`.
+2.  **DictOfColumns + FirstRow:** Verifies that using `FirstRow` headers with a dictionary of columns raises `ValueError`.
+3.  **ListOfLists + Keys:** Verifies that using `Keys` headers with a list of lists raises `ValueError`.
+
+This suite fills the gap where the main pairwise tests exclude these invalid scenarios.
+
+### 6. Evaluation Report
 
 To evaluate the effectiveness of the Pairwise approach, we compared it against a Random Baseline suite (`tests/test_random.py`) generated with the same test budget (18 tests).
 
@@ -133,7 +144,7 @@ The Random Baseline included the following invalid test cases which violate the 
 10. **Case 15:** `MissingValues='NA'`, `DataMix='IntsFloats'` AND `Size='WideText'`, `TableFormat='plain'` (Violates: NA replacement logic AND WideText requires grid format).
 11. **Case 16:** `InputType='ListOfLists'`, `HeadersMode='Keys'` (Violates: List input cannot use Keys headers).
 
-### 6. Installation & Usage
+### 7. Installation & Usage
 
 **1. Install Dependencies:**
 ```bash
@@ -145,7 +156,7 @@ To regenerate the pairwise tests, you need the Microsoft PICT tool.
 *   **Source:** [microsoft/pict](https://github.com/microsoft/pict)
 *   **Installation:** Follow the build instructions in the PICT repository. Ensure the `pict` executable is in your PATH.
 
-### 7. Usage Instructions
+### 8. Usage Instructions
 
 #### A. Generating Pairwise Tests
 If you have PICT installed, you can regenerate the test suite:
@@ -166,7 +177,13 @@ python3 -m pytest tests/test_random.py
 ```
 *Expect all pass (the test do not force constraits as a fail it added manually to report).*
 
-#### D. Check Coverage
+#### D. Running Negative Tests
+```bash
+python3 -m pytest tests/test_negative.py
+```
+*Expect all pass (confirms that invalid inputs raise exceptions).*
+
+#### E. Check Coverage
 ```bash
 python3 -m pytest --cov=src/tabulate tests/test_tabulate_pairwise.py
 ```

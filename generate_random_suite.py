@@ -39,7 +39,7 @@ def generate_random_tests(num_tests=20):
 # 4. Write to CSV
 if __name__ == "__main__":
     # We aim for 20 tests (approximate number a PICT 2-wise model would generate for this complexity)
-    generated_tests, headers = generate_random_tests(20)
+    generated_tests, headers = generate_random_tests(18)
     
     filename = "random_tests.csv"
     with open(filename, 'w', newline='') as f:

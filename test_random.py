@@ -15,14 +15,14 @@ class TestDataFactory:
     def generate_data(input_type, data_mix, size):
         rows = 2 if "Small" in size else 5
         cols = 2 if "Small" in size else 4
-        
+
         # Base data generation
         data = []
         for r in range(rows):
             row_data = []
             for c in range(cols):
                 val = f"r{r}c{c}" # Default string
-                
+
                 if data_mix == "IntsFloats":
                     val = r * 10 + c + 0.5
                 elif data_mix == "MixedNone":
@@ -31,21 +31,21 @@ class TestDataFactory:
                         val = None
                     else:
                         val = f"val_{r}_{c}"
-                
+
                 if size == "WideText" and c == 0:
                     val = "This is a very long text string intended to test layout."
-                
+
                 row_data.append(val)
             data.append(row_data)
 
         # Structure formatting
         if input_type == "ListOfLists":
             return data
-        
+
         elif input_type == "ListOfDicts":
             headers = [f"Head{i}" for i in range(cols)]
             return [dict(zip(headers, row)) for row in data]
-        
+
         elif input_type == "DictOfColumns":
             headers = [f"Head{i}" for i in range(cols)]
             # Transpose
@@ -53,7 +53,7 @@ class TestDataFactory:
             for i, h in enumerate(headers):
                 col_dict[h] = [row[i] for row in data]
             return col_dict
-        
+
         return data
 
     @staticmethod
@@ -86,17 +86,17 @@ class TestDataFactory:
 def load_pict_cases():
     cases = []
     try:
-        with open('pairwise_tests.csv', 'r') as f:
+        with open('random_tests.csv', 'r') as f:
             reader = csv.DictReader(f, delimiter='\t') # PICT usually outputs tab-separated
             # If PICT output comma, change delimiter to ','
             if reader.fieldnames and len(reader.fieldnames) == 1:
                  f.seek(0)
                  reader = csv.DictReader(f, delimiter=',')
-            
+
             for row in reader:
                 cases.append(row)
     except FileNotFoundError:
-        print("WARNING: 'pairwise_tests.csv' not found. Run PICT first.")
+        print("WARNING: 'random_tests.csv' not found.")
         return []
     return cases
 
@@ -130,32 +130,32 @@ def test_tabulate_pairwise(case):
 
     # 1. Prepare Inputs
     raw_data = TestDataFactory.generate_data(
-        case['InputType'], 
-        case['DataMix'], 
+        case['InputType'],
+        case['DataMix'],
         case['Size']
     )
-    
+
     headers_arg = TestDataFactory.get_headers(
-        case['HeadersMode'], 
-        case['InputType'], 
+        case['HeadersMode'],
+        case['InputType'],
         case['Size']
     )
-    
+
     showindex_arg = TestDataFactory.get_showindex(
-        case['RowIndices'], 
+        case['RowIndices'],
         case['Size']
     )
-    
+
     missingval_arg = "NA" if case['MissingValues'] == "NA" else ""
 
     # 2. Execution (The Action)
     try:
         # We construct the kwargs dynamically to handle default/empty cases
         kwargs = {'tablefmt': case['TableFormat']}
-        
-        if headers_arg: 
+
+        if headers_arg:
             kwargs['headers'] = headers_arg
-        
+
         if showindex_arg != "default":
             if headers_arg == "firstrow" and isinstance(showindex_arg, list):
                 # When using firstrow, the first data row becomes the header
@@ -163,7 +163,7 @@ def test_tabulate_pairwise(case):
                 kwargs['showindex'] = showindex_arg[1:]
             else:
                 kwargs['showindex'] = showindex_arg
-            
+
         if missingval_arg:
             kwargs['missingval'] = missingval_arg
 
@@ -173,10 +173,10 @@ def test_tabulate_pairwise(case):
         pytest.fail(f"Tabulate crashed with params {case}: {str(e)}")
 
     # 3. Oracles (Assertions)
-    
+
     # Oracle A: Result should not be empty
     assert len(result) > 0, "Output table was empty"
-    
+
     # Oracle B: If we asked for 'NA' replacement and had None values, check for it
     if case['MissingValues'] == "NA" and case['DataMix'] == "MixedNone":
         assert "NA" in result, "Missing value was not replaced with 'NA'"

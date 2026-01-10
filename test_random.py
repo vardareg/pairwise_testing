@@ -109,15 +109,6 @@ def test_tabulate_pairwise(case):
     """
     Executes one row from the PICT output.
     """
-    # 0. Enforce Constraints (Fail invalid cases that PICT would filter out)
-    # IF [InputType] IN {"ListOfDicts", "DictOfColumns"} THEN [HeadersMode] <> "FirstRow";
-    if case['InputType'] in ["ListOfDicts", "DictOfColumns"] and case['HeadersMode'] == "FirstRow":
-        pytest.fail("Constraint Violation: FirstRow headers not supported for dict-based inputs")
-
-    # IF [InputType] = "ListOfLists" THEN [HeadersMode] <> "Keys";
-    if case['InputType'] == "ListOfLists" and case['HeadersMode'] == "Keys":
-        pytest.fail("Constraint Violation: Keys headers not supported for ListOfLists")
-
     # 1. Prepare Inputs
     raw_data = TestDataFactory.generate_data(
         case['InputType'],

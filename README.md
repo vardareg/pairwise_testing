@@ -91,20 +91,9 @@ The tests are implemented using `pytest` in `tests/test_tabulate_pairwise.py`.
     1.  **Non-Empty Output:** Asserts that `tabulate()` returns a non-empty string.
     2.  **Missing Value Replacement:** If `MissingValues="NA"`, asserts that "NA" appears in the output.
     3.  **Explicit Headers:** If headers are provided explicitly, asserts they appear in the output.
-    4.  **Negative Tests:** While the primary suite focuses on valid inputs, the generated set includes combinations that stress-test valid edge cases (e.g., empty values, wide text).
+    4.  **Negative Tests:** We integrated a negative test suite (sourced from `data/negative_tests.csv`) into the pairwise runner. These tests intentionally violate system constraints (e.g., `ListOfDicts` + `FirstRow`) to verify that the system handles them gracefully by raising `ValueError` instead of behaving unpredictably.
 
-### 5. Negative Test Suite
-
-To ensure robustness, we implemented a dedicated **Negative Test Suite** (`tests/test_negative.py`) that specifically targets invalid combinations defined in our model. While the Pairwise suite intentionally avoids these combinations, the Negative Suite forces them to verify that the system handles them correctly by raising a `ValueError`.
-
-**Tested Violations:**
-1.  **ListOfDicts + FirstRow:** Verifies that using `FirstRow` headers with a list of dictionaries raises `ValueError`.
-2.  **DictOfColumns + FirstRow:** Verifies that using `FirstRow` headers with a dictionary of columns raises `ValueError`.
-3.  **ListOfLists + Keys:** Verifies that using `Keys` headers with a list of lists raises `ValueError`.
-
-This suite fills the gap where the main pairwise tests exclude these invalid scenarios.
-
-### 6. Evaluation Report
+### 5. Evaluation Report
 
 To evaluate the effectiveness of the Pairwise approach, we compared it against a Random Baseline suite (`tests/test_random.py`) generated with the same test budget (18 tests).
 
@@ -125,26 +114,11 @@ To evaluate the effectiveness of the Pairwise approach, we compared it against a
     *   **Bug Details:** The combination of `InputType=ListOfDicts` and `TableFormat=psql` causes `tabulate` to return an empty string (failure).
     *   **Tests Catching Bug:** Case 7 (`InputType=ListOfDicts`, `TableFormat=psql`, `Size=WideText`) and Case 12 (`InputType=ListOfDicts`, `TableFormat=psql`, `Size=Medium5x4`) in the generated CSV (mapped to pytest indices `case6` and `case10` due to 0-based indexing/header offset). *Note: The specific indices depend on the exact generated CSV order.*
 
-2.  **Random Baseline Weakness:**
-    *   **High Invalid Rate:** 11 out of 18 random tests (61%) were invalid because the random generator did not respect the logical constraints of the SUT.
-    *   **Bug Missed:** The random suite passed all tests (18 passed), completely missing the bug. This happened because it failed to generate the specific failure-inducing combination (`ListOfDicts` + `psql`) within the limited budget.
+2.  **Random Baseline Analysis:**
+    *   **Graceful Rejection:** Previously, the random suite failed (crashed) on invalid tests. With the new constraint enforcement code, the 11 invalid test cases now trigger a `ValueError` which the test runner catches and treats as a **PASS** (Correct Rejection).
+    *   **Bug Missed:** Despite passing the invalid cases gracefully, the random suite still **completely missed the bug**. This is because it failed to generate the specific failure-inducing combination (`ListOfDicts` + `psql`) within the limited budget.
 
-#### Note: Invalid Random Cases
-The Random Baseline included the following invalid test cases which violate the defined system constraints:
-
-1.  **Case 1:** `InputType='DictOfColumns'`, `HeadersMode='FirstRow'` (Violates: Dict input cannot use FirstRow).
-2.  **Case 3:** `MissingValues='NA'`, `DataMix='Strings'` (Violates: NA replacement requires MixedNone data).
-3.  **Case 4:** `MissingValues='NA'`, `DataMix='Strings'` (Violates: NA replacement requires MixedNone data).
-4.  **Case 6:** `InputType='ListOfDicts'`, `HeadersMode='FirstRow'` (Violates: Dict input cannot use FirstRow).
-5.  **Case 8:** `MissingValues='NA'`, `DataMix='IntsFloats'` (Violates: NA replacement requires MixedNone data).
-6.  **Case 10:** `MissingValues='NA'`, `DataMix='IntsFloats'` (Violates: NA replacement requires MixedNone data).
-7.  **Case 12:** `MissingValues='NA'`, `DataMix='Strings'` (Violates: NA replacement requires MixedNone data).
-8.  **Case 13:** `MissingValues='NA'`, `DataMix='Strings'` (Violates: NA replacement requires MixedNone data).
-9.  **Case 14:** `InputType='DictOfColumns'`, `HeadersMode='FirstRow'` (Violates: Dict input cannot use FirstRow).
-10. **Case 15:** `MissingValues='NA'`, `DataMix='IntsFloats'` AND `Size='WideText'`, `TableFormat='plain'` (Violates: NA replacement logic AND WideText requires grid format).
-11. **Case 16:** `InputType='ListOfLists'`, `HeadersMode='Keys'` (Violates: List input cannot use Keys headers).
-
-### 7. Installation & Usage
+### 6. Installation & Usage
 
 **1. Install Dependencies:**
 ```bash
@@ -156,7 +130,7 @@ To regenerate the pairwise tests, you need the Microsoft PICT tool.
 *   **Source:** [microsoft/pict](https://github.com/microsoft/pict)
 *   **Installation:** Follow the build instructions in the PICT repository. Ensure the `pict` executable is in your PATH.
 
-### 8. Usage Instructions
+### 7. Usage Instructions
 
 #### A. Generating Pairwise Tests
 If you have PICT installed, you can regenerate the test suite:
@@ -165,25 +139,19 @@ pict data/tabulate_model.txt > data/pairwise_tests.csv
 ```
 *Note: `data/pairwise_tests.csv` is already included in the repo, so this step is optional.*
 
-#### B. Running Pairwise Tests
+#### B. Running Pairwise Tests (Integrated Negative Tests)
 ```bash
 python3 -m pytest tests/test_tabulate_pairwise.py
 ```
-*Expect failures due to the identified bug.*
+*Expect failures due to the identified bug, but negative tests should pass.*
 
 #### C. Running Random Baseline
 ```bash
 python3 -m pytest tests/test_random.py
 ```
-*Expect all pass (the test do not force constraits as a fail it added manually to report).*
+*Expect all pass. Invalid cases are now correctly rejected with ValueError.*
 
-#### D. Running Negative Tests
-```bash
-python3 -m pytest tests/test_negative.py
-```
-*Expect all pass (confirms that invalid inputs raise exceptions).*
-
-#### E. Check Coverage
+#### D. Check Coverage
 ```bash
 python3 -m pytest --cov=src/tabulate tests/test_tabulate_pairwise.py
 ```

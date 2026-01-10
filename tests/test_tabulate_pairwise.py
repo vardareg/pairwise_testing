@@ -85,6 +85,7 @@ class TestDataFactory:
 # ---------------------------------------------------------
 def load_pict_cases():
     cases = []
+    # Load Valid Pairwise Tests
     try:
         data_path = Path(__file__).parent.parent / "data" / "pairwise_tests.csv"
         with open(data_path, 'r') as f:
@@ -98,7 +99,17 @@ def load_pict_cases():
                 cases.append(row)
     except FileNotFoundError:
         print("WARNING: 'pairwise_tests.csv' not found. Run PICT first.")
-        return []
+
+    # Load Negative Tests (Invalid cases that should raise exceptions)
+    try:
+        neg_path = Path(__file__).parent.parent / "data" / "negative_tests.csv"
+        with open(neg_path, 'r') as f:
+            reader = csv.DictReader(f, delimiter=',')
+            for row in reader:
+                cases.append(row)
+    except FileNotFoundError:
+        print("WARNING: 'negative_tests.csv' not found.")
+
     return cases
 
 test_cases = load_pict_cases()
@@ -135,6 +146,24 @@ def test_tabulate_pairwise(case):
     missingval_arg = "NA" if case['MissingValues'] == "NA" else ""
 
     # 2. Execution (The Action)
+
+    # CASE: Negative Test (Expected Exception)
+    if case.get('ExpectedException') == 'ValueError':
+        # We construct the kwargs dynamically to handle default/empty cases
+        kwargs = {'tablefmt': case['TableFormat']}
+        if headers_arg: kwargs['headers'] = headers_arg
+        if showindex_arg != "default":
+            if headers_arg == "firstrow" and isinstance(showindex_arg, list):
+                kwargs['showindex'] = showindex_arg[1:]
+            else:
+                kwargs['showindex'] = showindex_arg
+        if missingval_arg: kwargs['missingval'] = missingval_arg
+
+        with pytest.raises(ValueError, match="not supported"):
+            tabulate(raw_data, **kwargs)
+        return # Success for negative test
+
+    # CASE: Valid Test
     try:
         # We construct the kwargs dynamically to handle default/empty cases
         kwargs = {'tablefmt': case['TableFormat']}

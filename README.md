@@ -170,3 +170,7 @@ python3 -m pytest tests/test_random.py
 ```bash
 python3 -m pytest --cov=src/tabulate tests/test_tabulate_pairwise.py
 ```
+---
+**Authors:**  
+Egehan Vardar (323011010)  
+M. Fatih Gülmez (323011006)

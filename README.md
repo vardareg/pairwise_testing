@@ -92,9 +92,9 @@ python3 -m pytest --cov=test_tabulate_pairwise test_tabulate_pairwise.py
 
 | Metric | Pairwise Suite | Random Baseline |
 | :--- | :--- | :--- |
-| **Total Tests** | [Enter count] | [Enter count] |
-| **Valid Tests** | [Enter count] | [Enter count] |
-| **Invalid Tests (Constraint Violations)** | [Enter count] | [Enter count] |
+| **Total Tests** | 18 | 18 |
+| **Valid Tests** | 18| 7 |
+| **Invalid Tests (Constraint Violations)** | 0 | 11 |
 | **Bugs Found** | [Enter count] | [Enter count] |
 | **Statement Coverage** | [Enter %] | [Enter %] |
 

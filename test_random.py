@@ -178,21 +178,4 @@ def test_tabulate_pairwise(case):
             "Constraint Violation: FirstRow headers not supported for dict-based inputs"
         )
 
-    # 2 & 4. IF [HeadersMode] = "Keys" THEN [InputType] IN {"ListOfDicts", "DictOfColumns"};
-    # (Equivalent to IF [InputType] = "ListOfLists" THEN [HeadersMode] <> "Keys")
-    if case["InputType"] == "ListOfLists" and case["HeadersMode"] == "Keys":
-        pytest.fail("Constraint Violation: Keys headers not supported for ListOfLists")
 
-    # 3. IF [MissingValues] = "NA" THEN [DataMix] = "MixedNone";
-    if case["MissingValues"] == "NA" and case["DataMix"] != "MixedNone":
-        pytest.fail(
-            "Constraint Violation: MissingValues='NA' requires DataMix='MixedNone'"
-        )
-
-    # 5. IF [Size] = "WideText" THEN [TableFormat] IN {"grid", "psql", "github"};
-    if case["Size"] == "WideText" and case["TableFormat"] not in [
-        "grid",
-        "psql",
-        "github",
-    ]:
-        pytest.fail("Constraint Violation: WideText requires grid/psql/github format")

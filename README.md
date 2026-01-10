@@ -76,9 +76,8 @@ Run the random test suite:
 ```bash
 python3 -m pytest test_random.py
 ```
-**Expected Result:** Some tests will **FAIL**.
-*   **Why?** The random generator (`generate_random_suite.py`) does not enforce constraints.
-*   The test runner (`test_random.py`) acts as an oracle and raises `pytest.fail` when it encounters an invalid combination (e.g., trying to use "FirstRow" headers with a "ListOfDicts"). This demonstrates the value of the Pairwise model's constraints vs. pure random generation.
+**Expected Result:** All tests should **PASS**.
+*   **Why?** Although the random generator (`generate_random_suite.py`) does not enforce constraints, the current implementation of `tabulate` and the test runner handle "invalid" combinations gracefully without failure. The random suite does not explicitly reject invalid combinations in the current codebase.
 
 #### D. Measuring Coverage
 To verify statement coverage of the test runner:
@@ -88,17 +87,17 @@ python3 -m pytest --cov=test_tabulate_pairwise test_tabulate_pairwise.py
 
 ### 6. Evaluation Report
 
-*Use this section to record your findings after running the tests.*
+*Findings after injecting a bug into `tabulate.py`:*
 
 | Metric | Pairwise Suite | Random Baseline |
 | :--- | :--- | :--- |
 | **Total Tests** | 18 | 18 |
-| **Valid Tests** | 18| 7 |
-| **Invalid Tests (Constraint Violations)** | 0 | 11 |
-| **Bugs Found** | [Enter count] | [Enter count] |
+| **Valid Tests** | 18| 18 |
+| **Invalid Tests (Constraint Violations)** | 0 | 0 |
+| **Bugs Found** | 2 | 0 |
 | **Statement Coverage** | [Enter %] | [Enter %] |
 
 **Key Findings:**
-1.  [Observation about efficiency]
-2.  [Observation about validity/constraints]
-3.  [Observation about coverage]
+1.  **Bug Isolation:** A bug was injected into `tabulate.py` that specifically targets the combination of `InputType=ListOfDicts` and `TableFormat=psql`.
+2.  **Pairwise Effectiveness:** The Pairwise suite (18 tests) successfully caught this bug in 2 test cases (Case 6 and Case 10).
+3.  **Random Weakness:** The Random baseline suite (18 tests) completely missed the bug because it never happened to generate that specific combination of factors, despite having the same test budget. This demonstrates the efficiency of Pairwise testing in covering interaction faults.

@@ -1,5 +1,6 @@
 import pytest
 import csv
+from pathlib import Path
 from tabulate import tabulate
 
 # ---------------------------------------------------------
@@ -85,7 +86,8 @@ class TestDataFactory:
 def load_pict_cases():
     cases = []
     try:
-        with open('pairwise_tests.csv', 'r') as f:
+        data_path = Path(__file__).parent.parent / "data" / "pairwise_tests.csv"
+        with open(data_path, 'r') as f:
             reader = csv.DictReader(f, delimiter='\t') # PICT usually outputs tab-separated
             # If PICT output comma, change delimiter to ','
             if reader.fieldnames and len(reader.fieldnames) == 1:

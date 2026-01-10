@@ -1,5 +1,6 @@
 import csv
 import random
+from pathlib import Path
 
 # 1. Define Domains (The Input Factors)
 domains = {
@@ -41,7 +42,9 @@ if __name__ == "__main__":
     # We aim for 20 tests (approximate number a PICT 2-wise model would generate for this complexity)
     generated_tests, headers = generate_random_tests(18)
     
-    filename = "random_tests.csv"
+    data_dir = Path(__file__).parent.parent / "data"
+    filename = data_dir / "random_tests.csv"
+
     with open(filename, 'w', newline='') as f:
         writer = csv.DictWriter(f, fieldnames=headers)
         writer.writeheader()

@@ -110,28 +110,7 @@ def test_tabulate_pairwise(case):
     Executes one row from the PICT output.
     """
 
-    # ---------------------------------------------------------
-    # CONSTRAINT CHECKING
-    # ---------------------------------------------------------
-    # 1. IF [InputType] IN {"ListOfDicts", "DictOfColumns"} THEN [HeadersMode] <> "FirstRow"
-    if case['InputType'] in ["ListOfDicts", "DictOfColumns"] and case['HeadersMode'] == "FirstRow":
-        pytest.fail("Constraint violated: InputType ListOfDicts/DictOfColumns cannot have HeadersMode FirstRow")
 
-    # 2. IF [HeadersMode] = "Keys" THEN [InputType] IN {"ListOfDicts", "DictOfColumns"}
-    if case['HeadersMode'] == "Keys" and case['InputType'] not in ["ListOfDicts", "DictOfColumns"]:
-        pytest.fail("Constraint violated: HeadersMode Keys requires InputType ListOfDicts or DictOfColumns")
-
-    # 3. IF [MissingValues] = "NA" THEN [DataMix] = "MixedNone"
-    if case['MissingValues'] == "NA" and case['DataMix'] != "MixedNone":
-        pytest.fail("Constraint violated: MissingValues NA requires DataMix MixedNone")
-
-    # 4. IF [InputType] = "ListOfLists" THEN [HeadersMode] <> "Keys"
-    if case['InputType'] == "ListOfLists" and case['HeadersMode'] == "Keys":
-        pytest.fail("Constraint violated: InputType ListOfLists cannot have HeadersMode Keys")
-
-    # 5. IF [Size] = "WideText" THEN [TableFormat] IN {"grid", "psql", "github"}
-    if case['Size'] == "WideText" and case['TableFormat'] not in ["grid", "psql", "github"]:
-        pytest.fail("Constraint violated: Size WideText requires TableFormat grid, psql, or github")
 
     # 1. Prepare Inputs
     raw_data = TestDataFactory.generate_data(

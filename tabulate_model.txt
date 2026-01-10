@@ -1,0 +1,19 @@
+# ---------------------------------------------------------
+# PARAMETERS
+# ---------------------------------------------------------
+InputType:      ListOfLists, ListOfDicts, DictOfColumns
+HeadersMode:    Explicit, FirstRow, Keys
+TableFormat:    plain, github, grid, psql
+RowIndices:     always, never, Custom
+MissingValues:  Default, NA
+DataMix:        Strings, IntsFloats, MixedNone
+Size:           Small2x2, Medium5x4, WideText
+
+# ---------------------------------------------------------
+# CONSTRAINTS
+# ---------------------------------------------------------
+IF [InputType] IN {"ListOfDicts", "DictOfColumns"} THEN [HeadersMode] <> "FirstRow";
+IF [HeadersMode] = "Keys" THEN [InputType] IN {"ListOfDicts", "DictOfColumns"};
+IF [MissingValues] = "NA" THEN [DataMix] = "MixedNone";
+IF [InputType] = "ListOfLists" THEN [HeadersMode] <> "Keys";
+IF [Size] = "WideText" THEN [TableFormat] IN {"grid", "psql", "github"};

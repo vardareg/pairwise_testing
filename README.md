@@ -123,19 +123,33 @@ The Random Baseline included the following invalid test cases which violate the 
 pip install pytest tabulate pytest-cov
 ```
 
-**2. Run Pairwise Tests:**
+**2. (Optional) Install PICT:**
+To regenerate the pairwise tests, you need the Microsoft PICT tool.
+*   **Source:** [microsoft/pict](https://github.com/microsoft/pict)
+*   **Installation:** Follow the build instructions in the PICT repository. Ensure the `pict` executable is in your PATH.
+
+### 7. Usage Instructions
+
+#### A. Generating Pairwise Tests
+If you have PICT installed, you can regenerate the test suite:
+```bash
+pict tabulate_model.txt > pairwise_tests.csv
+```
+*Note: `pairwise_tests.csv` is already included in the repo, so this step is optional.*
+
+#### B. Running Pairwise Tests
 ```bash
 python3 -m pytest test_tabulate_pairwise.py
 ```
 *Expect failures due to the identified bug.*
 
-**3. Run Random Baseline:**
+#### C. Running Random Baseline
 ```bash
 python3 -m pytest test_random.py
 ```
 *Expect all pass (false negatives due to lack of coverage).*
 
-**4. Check Coverage:**
+#### D. Check Coverage
 ```bash
 python3 -m pytest --cov=test_tabulate_pairwise test_tabulate_pairwise.py
 ```

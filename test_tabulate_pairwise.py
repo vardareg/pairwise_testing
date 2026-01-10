@@ -60,6 +60,8 @@ class TestDataFactory:
     def get_headers(headers_mode, input_type, size):
         cols = 2 if "Small" in size else 4
         if headers_mode == "Explicit":
+            if input_type == "ListOfDicts":
+                return {f"Head{i}": f"Col_Hex_{i}" for i in range(cols)}
             return [f"Col_Hex_{i}" for i in range(cols)]
         elif headers_mode == "FirstRow":
             return "firstrow"
@@ -137,7 +139,12 @@ def test_tabulate_pairwise(case):
             kwargs['headers'] = headers_arg
         
         if showindex_arg != "default":
-            kwargs['showindex'] = showindex_arg
+            if headers_arg == "firstrow" and isinstance(showindex_arg, list):
+                # When using firstrow, the first data row becomes the header
+                # so the index list needs to be one shorter.
+                kwargs['showindex'] = showindex_arg[1:]
+            else:
+                kwargs['showindex'] = showindex_arg
             
         if missingval_arg:
             kwargs['missingval'] = missingval_arg

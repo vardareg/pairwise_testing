@@ -91,7 +91,7 @@ The tests are implemented using `pytest` in `test_tabulate_pairwise.py`.
     1.  **Non-Empty Output:** Asserts that `tabulate()` returns a non-empty string.
     2.  **Missing Value Replacement:** If `MissingValues="NA"`, asserts that "NA" appears in the output.
     3.  **Explicit Headers:** If headers are provided explicitly, asserts they appear in the output.
-    4.  **Negative Tests:** While the primary suite focuses on valid inputs, the generated set includes combinations that stress-test valid edge cases (e.g., empty values, wide text).
+    4.  **Negative Tests:** Negative tests are manually generated and classified as invalid, since they do not contribute any valuable insights to the testing process.
 
 ### 5. Evaluation Report
 
@@ -112,13 +112,13 @@ To evaluate the effectiveness of the Pairwise approach, we compared it against a
 1.  **Pairwise Effectiveness:**
     *   The Pairwise suite successfully identified a **bug** in the system.
     *   **Bug Details:** The combination of `InputType=ListOfDicts` and `TableFormat=psql` causes `tabulate` to return an empty string (failure).
-    *   **Tests Catching Bug:** Case 7 (`InputType=ListOfDicts`, `TableFormat=psql`, `Size=WideText`) and Case 12 (`InputType=ListOfDicts`, `TableFormat=psql`, `Size=Medium5x4`) in the generated CSV (mapped to pytest indices `case6` and `case10` due to 0-based indexing/header offset). *Note: The specific indices depend on the exact generated CSV order.*
+    *   **Tests Catching Bug:** Case 7 (`InputType=ListOfDicts`, `TableFormat=psql`, `Size=WideText`) and Case 11 (`InputType=ListOfDicts`, `TableFormat=psql`, `Size=Medium5x4`) in the generated CSV (mapped to pytest indices `case6` and `case10` due to 0-based indexing/header offset). *Note: The specific indices depend on the exact generated CSV order.*
 
 2.  **Random Baseline Weakness:**
     *   **High Invalid Rate:** 11 out of 18 random tests (61%) were invalid because the random generator did not respect the logical constraints of the SUT.
     *   **Bug Missed:** The random suite passed all tests (18 passed), completely missing the bug. This happened because it failed to generate the specific failure-inducing combination (`ListOfDicts` + `psql`) within the limited budget.
 
-#### Note: Invalid Random Cases
+#### Note: Invalid Random Cases (Negative Tests)
 The Random Baseline included the following invalid test cases which violate the defined system constraints:
 
 1.  **Case 1:** `InputType='DictOfColumns'`, `HeadersMode='FirstRow'` (Violates: Dict input cannot use FirstRow).

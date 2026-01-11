@@ -91,7 +91,8 @@ The tests are implemented using `pytest` in `test_tabulate_pairwise.py`.
     1.  **Non-Empty Output:** Asserts that `tabulate()` returns a non-empty string.
     2.  **Missing Value Replacement:** If `MissingValues="NA"`, asserts that "NA" appears in the output.
     3.  **Explicit Headers:** If headers are provided explicitly, asserts they appear in the output.
-    4.  **Negative Tests:** While the primary suite focuses on valid inputs, the generated set includes combinations that stress-test valid edge cases (e.g., empty values, wide text).
+    4.  **Format Adherence:** Asserts that the output string matches the requested format (e.g., `grid` format must contain `+` and `|` characters; `plain` must contain neither).
+    5.  **Negative Tests:** While the Pairwise suite handles valid edge cases (like wide text), we now have a **dedicated manual test suite** (`test_negative_cases.py`) to verify that the system gracefully handles invalid input constraints (e.g., Dictionary input with "FirstRow" headers).
 
 ### 5. Evaluation Report
 
@@ -160,13 +161,19 @@ python3 -m pytest test_tabulate_pairwise.py
 ```
 *Expect failures due to the identified bug.*
 
-#### C. Running Random Baseline
+#### C. Running Negative Tests
+```bash
+python3 -m pytest test_negative_cases.py
+```
+*Expect these tests to pass if the system handles invalid inputs gracefully (no crashes).*
+
+#### D. Running Random Baseline
 ```bash
 python3 -m pytest test_random.py
 ```
 *Expect all pass (the test do not force constraits as a fail it added manually to report).*
 
-#### D. Check Coverage
+#### E. Check Coverage
 ```bash
 python3 -m pytest --cov=test_tabulate_pairwise test_tabulate_pairwise.py
 ```

@@ -170,3 +170,19 @@ def test_tabulate_pairwise(case):
         # Check first header specifically
         assert "Col_Hex_0" in result, "Explicit headers missing from output"
 
+    # Oracle D: Format Specific Assertions
+    fmt = case['TableFormat']
+
+    # 1. Assertions for grid-like formats
+    if fmt in ["grid", "psql"]:
+        assert "+" in result, f"Format '{fmt}' must contain grid markers (+)"
+        assert "|" in result, f"Format '{fmt}' must contain vertical separators (|)"
+
+    # 2. Assertions for github (pipe-like)
+    elif fmt == "github":
+        assert "|" in result, f"Format '{fmt}' must contain vertical separators (|)"
+
+    # 3. Assertions for plain (no borders)
+    elif fmt == "plain":
+        assert "+" not in result, f"Format '{fmt}' should not contain grid markers (+)"
+        assert "|" not in result, f"Format '{fmt}' should not contain vertical separators (|)"

@@ -103,9 +103,9 @@ To evaluate the effectiveness of the Pairwise approach, we compared it against a
 | :--- | :--- | :--- |
 | **Total Tests (Budget)** | 18 | 18 |
 | **Valid Tests** | 18 | 7 |
-| **Invalid Tests (Constraint Violations)** | 0 | 11 |
+| **Invalid Tests (Constraint Violations)** | 0 | 11 | (Manually Calculated)
 | **Bugs Found** | 2 | 0 |
-| **Statement Coverage** | 90% | N/A |
+| **Statement Coverage** | 90% | 90% |
 
 #### Analysis
 
@@ -170,3 +170,7 @@ python3 -m pytest test_random.py
 ```bash
 python3 -m pytest --cov=test_tabulate_pairwise test_tabulate_pairwise.py
 ```
+----
+**Authors:**  
+Egehan Vardar (323011010)  
+M. Fatih Gülmez (323011006)

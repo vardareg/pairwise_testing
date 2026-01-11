@@ -170,3 +170,4 @@ def test_tabulate_pairwise(case):
         # Check first header specifically
         assert "Col_Hex_0" in result, "Explicit headers missing from output"
 
+  

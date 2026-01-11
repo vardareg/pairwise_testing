@@ -1,131 +1,31 @@
 import pytest
-import csv
 from tabulate import tabulate
-
-# ---------------------------------------------------------
-# HELPER: DATA GENERATION FACTORY
-# ---------------------------------------------------------
-class TestDataFactory:
-    """
-    Translates abstract PICT parameters into concrete Python objects
-    for the tabulate library.
-    """
-    @staticmethod
-    def generate_data(input_type, data_mix, size):
-        rows = 2 if "Small" in size else 5
-        cols = 2 if "Small" in size else 4
-        
-        # Base data generation
-        data = []
-        for r in range(rows):
-            row_data = []
-            for c in range(cols):
-                val = f"r{r}c{c}" # Default string
-                
-                if data_mix == "IntsFloats":
-                    val = r * 10 + c + 0.5
-                elif data_mix == "MixedNone":
-                    # Inject None in the middle of the dataset
-                    if r == 1 and c == 1:
-                        val = None
-                    else:
-                        val = f"val_{r}_{c}"
-                
-                if size == "WideText" and c == 0:
-                    val = "This is a very long text string intended to test layout."
-                
-                row_data.append(val)
-            data.append(row_data)
-
-        # Structure formatting
-        if input_type == "ListOfLists":
-            return data
-        
-        elif input_type == "ListOfDicts":
-            headers = [f"Head{i}" for i in range(cols)]
-            return [dict(zip(headers, row)) for row in data]
-        
-        elif input_type == "DictOfColumns":
-            headers = [f"Head{i}" for i in range(cols)]
-            # Transpose
-            col_dict = {}
-            for i, h in enumerate(headers):
-                col_dict[h] = [row[i] for row in data]
-            return col_dict
-        
-        return data
-
-    @staticmethod
-    def get_headers(headers_mode, input_type, size):
-        cols = 2 if "Small" in size else 4
-        if headers_mode == "Explicit":
-            if input_type == "ListOfDicts":
-                return {f"Head{i}": f"Col_Hex_{i}" for i in range(cols)}
-            return [f"Col_Hex_{i}" for i in range(cols)]
-        elif headers_mode == "FirstRow":
-            return "firstrow"
-        elif headers_mode == "Keys":
-            return "keys"
-        return []
-
-    @staticmethod
-    def get_showindex(row_indices, size):
-        rows = 2 if "Small" in size else 5
-        if row_indices == "always":
-            return "always"
-        elif row_indices == "never":
-            return "never"
-        elif row_indices == "Custom":
-            return [f"id_{i}" for i in range(rows)]
-        return "default"
-
-# ---------------------------------------------------------
-# CSV LOADER
-# ---------------------------------------------------------
-def load_pict_cases():
-    cases = []
-    try:
-        with open('pairwise_tests.csv', 'r') as f:
-            reader = csv.DictReader(f, delimiter='\t') # PICT usually outputs tab-separated
-            # If PICT output comma, change delimiter to ','
-            if reader.fieldnames and len(reader.fieldnames) == 1:
-                 f.seek(0)
-                 reader = csv.DictReader(f, delimiter=',')
-            
-            for row in reader:
-                cases.append(row)
-    except FileNotFoundError:
-        print("WARNING: 'pairwise_tests.csv' not found. Run PICT first.")
-        return []
-    return cases
-
-test_cases = load_pict_cases()
 
 # ---------------------------------------------------------
 # PYTEST EXECUTION
 # ---------------------------------------------------------
-@pytest.mark.parametrize("case", test_cases)
-def test_tabulate_pairwise(case):
+def test_tabulate_pairwise(pairwise_case, data_factory):
     """
     Executes one row from the PICT output.
+    Uses `pairwise_case` fixture from conftest.py for data.
+    Uses `data_factory` fixture from conftest.py for helper methods.
     """
-
-
+    case = pairwise_case
 
     # 1. Prepare Inputs
-    raw_data = TestDataFactory.generate_data(
+    raw_data = data_factory.generate_data(
         case['InputType'], 
         case['DataMix'], 
         case['Size']
     )
     
-    headers_arg = TestDataFactory.get_headers(
+    headers_arg = data_factory.get_headers(
         case['HeadersMode'], 
         case['InputType'], 
         case['Size']
     )
     
-    showindex_arg = TestDataFactory.get_showindex(
+    showindex_arg = data_factory.get_showindex(
         case['RowIndices'], 
         case['Size']
     )
@@ -169,5 +69,3 @@ def test_tabulate_pairwise(case):
     if case['HeadersMode'] == "Explicit":
         # Check first header specifically
         assert "Col_Hex_0" in result, "Explicit headers missing from output"
-
-  

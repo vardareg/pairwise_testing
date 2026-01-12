@@ -1,5 +1,4 @@
-# SEDS 514 Software Testing - Project 3
-## Pairwise Test Design on a Real OSS Project
+# Pairwise Test Design on a Real OSS Project
 
 **Project Status:** Completed
 **System Under Test:** [python-tabulate](https://github.com/astanin/python-tabulate)
@@ -171,6 +170,4 @@ python3 -m pytest test_random.py
 python3 -m pytest --cov=test_tabulate_pairwise test_tabulate_pairwise.py
 ```
 ----
-**Authors:**  
-Egehan Vardar (323011010)  
-M. Fatih Gülmez (323011006)
+
